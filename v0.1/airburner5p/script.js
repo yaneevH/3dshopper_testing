@@ -1,15 +1,16 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import CameraControls from 'camera-controls';
-
 CameraControls.install({ THREE: THREE });
 
 const clock = new THREE.Clock();
 const scene = new THREE.Scene();
+
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100);
-camera.position.set(0, 0, 5);
+camera.position.set(0, 5, 10); // Adjusted camera position for better view of the grid
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene-canvas') });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0xBAE4E5, 1); // Set background color to light blue
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
 renderer.physicallyCorrectLights = true;
@@ -18,26 +19,10 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 const cameraControls = new CameraControls(camera, renderer.domElement);
 window.cameraControls = cameraControls; // Make cameraControls globally accessible
 
-// Generate buttons
-const buttonContainer = document.getElementById('button-container');
-
-const fitButton = document.createElement('button');
-fitButton.type = 'button';
-fitButton.textContent = 'Fit';
-fitButton.onclick = () => window.fit();
-buttonContainer.appendChild(fitButton);
-
-const resetButton = document.createElement('button');
-resetButton.type = 'button';
-resetButton.textContent = 'Reset';
-resetButton.onclick = () => window.cameraControls.reset(true);
-buttonContainer.appendChild(resetButton);
-
-const cameraButtonsContainer = document.createElement('div');
-cameraButtonsContainer.id = 'camera-buttons';
-cameraButtonsContainer.style.display = 'flex';
-cameraButtonsContainer.style.alignItems = 'center';
-buttonContainer.appendChild(cameraButtonsContainer);
+// Create a grid with size 12 (approximately 60% of 20) and thicker grid lines
+const gridHelper = new THREE.GridHelper(12, 12, 0x000000, 0x000000);
+gridHelper.material.linewidth = 10; // Thicker grid lines
+scene.add(gridHelper);
 
 // Load environment map
 new THREE.TextureLoader().load('./env.jpg', (equirectangularMap) => {
@@ -50,9 +35,6 @@ new THREE.TextureLoader().load('./env.jpg', (equirectangularMap) => {
     scene.environment = envMapRenderTarget.texture;
 });
 
-const gridHelper = new THREE.GridHelper(50, 50);
-scene.add(gridHelper);
-
 // Load GLTF model and cameras
 new GLTFLoader().load('./airburner_5p_cameras.glb', function (gltf) {
     const model = gltf.scene;
@@ -61,10 +43,13 @@ new GLTFLoader().load('./airburner_5p_cameras.glb', function (gltf) {
     scene.add(model);
 
     // Create buttons for each camera
+    const cameraButtonsContainer = document.getElementById('camera-buttons');
     cameras.forEach((cam, index) => {
         const button = document.createElement('button');
         button.textContent = `Cam ${index + 1}`;
-        button.onclick = () => fitToCamera(cam);
+        button.onclick = () => {
+            fitToCamera(cam);
+        };
         cameraButtonsContainer.appendChild(button);
     });
 
