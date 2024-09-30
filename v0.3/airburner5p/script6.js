@@ -10,7 +10,7 @@ const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerH
 camera.position.set(0, 5, 10); // Adjusted camera position for better view of the grid
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('scene-canvas') });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x91A8D0, 1); // Set background color to light blue
+renderer.setClearColor(0xf5f5f5, 1); // Set background color to light blue
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
 renderer.physicallyCorrectLights = true;
